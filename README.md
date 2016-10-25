@@ -1,6 +1,6 @@
-## README ##
+## README 
 
-### Teoria ###
+### Teoria 
 
 Projekt powstał głównie w oparciu o informacje z książki: B. Korzan, "Grafy, hipergrafy i sieci".
 
@@ -20,7 +20,7 @@ Sposoby przedstawienia hipergrafu jako macierz:
 * macierz osiągalności (silnej spójności) D
 * macierz spójności S
 
-### Aktualny stan ###
+### Aktualny stan 
 
 * Program napisany w języku Python (najlepiej działa z implementacją CPython3),
 * interfejs zaimplementowany za pomocą pakietu GTK3 (przez Python GObject Introspection),
@@ -44,13 +44,13 @@ W pewnym stopniu zoptymalizowano:
 * edytor skryptów, w którym można uruchomić algorytm analizujący/edytujący/tworzący model,
 * dodatkowe klasy pomocnicze, metody pomocnicze.
 
-### Zależności ###
+### Zależności 
 
-#### Ubuntu ####
+#### Ubuntu 
 
 (dla python3: na Ubuntu 16.04 Mate 64bit aplikacja działa bez instalowania dodatkowych zależności, standardowa wersja Ubuntu 16.04 64bit wymaga zainstalowania numpy)
 
-##### apt dla Python3: #####
+##### apt dla Python3: 
 
 * python3
 * python3-dev
@@ -59,9 +59,37 @@ W pewnym stopniu zoptymalizowano:
 * python-gi-cairo
 * llvm (opcjonalnie)
 
-##### pip3 dla Python3: #####
+##### pip3 dla Python3: 
 
 * numpy
 * cairo
 * pgi
 * pyopencl (opcjonalnie)
+
+### Using the environment
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen01.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen02.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen03.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen04.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen05.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen06.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen07.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen08.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen09.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen10.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen11.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen12.png)
+
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen13.png)
