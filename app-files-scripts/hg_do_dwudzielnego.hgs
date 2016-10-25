@@ -1,0 +1,30 @@
+hgprint('Hello World')
+hgprint(hg)
+
+n_id_list = hg.get_all_nodes_id()
+nodes_list = [hg.get_node_by_id(nid) for nid in n_id_list]
+
+hb_id_list = hg.get_all_hyperbranches_id()
+hbnodes_list = [hg.get_hbnode_by_id(hid) for hid in hb_id_list]
+
+hgprint("Id wierzchołków:")
+hgprint(n_id_list)
+
+hgprint("Id hipergałęzi:")
+hgprint(hb_id_list)
+
+for i, n in enumerate(nodes_list):
+	pos = np.array((1.0, 1.0))
+	pos *= (16,i)
+	pos *= 80
+	n.set_position(pos)
+
+for i, n in enumerate(hbnodes_list):
+	nodes_for_hb_id = hg.get_all_nodes_id_by_hyperbranch_id(n.get_id())
+	com = hg.get_xnodes_center_of_mass_by_xnodes_id_list(nodes_for_hb_id)
+	n.set_position(com+(-1600,(1+i - len(hbnodes_list)/2)*128))
+
+
+
+
+

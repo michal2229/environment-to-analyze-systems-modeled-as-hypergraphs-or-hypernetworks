@@ -1,0 +1,26 @@
+hgprint('Hello World')
+hgprint(hg)
+
+Ab = hg.bin_macierz_incydencji()
+B = hg.macierz_przyleglosci_galezi()
+
+hgprint(Ab)
+
+Abmat = Ab['matrix']
+Bmat = B['matrix']
+b = Bmat
+
+a = Abmat
+hgprint(a)
+
+at = Abmat.transpose()
+hgprint(at)
+
+atxa = np.dot(at, a)
+
+hgprint(atxa)
+
+hgprint(b)
+
+hgprint(np.equal(atxa, b))
+hgprint(np.equal(atxa, b).all())

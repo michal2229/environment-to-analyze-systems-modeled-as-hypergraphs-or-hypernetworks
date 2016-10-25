@@ -1,0 +1,4 @@
+gi       # gi dla python3
+cairo    # cairo dla python3
+numpy    # numpy  python3
+# pyopencl # sudo pip3 install pyopencl 

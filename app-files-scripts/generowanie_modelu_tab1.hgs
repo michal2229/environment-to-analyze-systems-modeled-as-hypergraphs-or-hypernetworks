@@ -1,0 +1,115 @@
+sciezka_modelu = './model_z_edytora_tab1.hg'
+
+# funkcja pomocnicza, znajdujaca id elementu hipergrafu po jego nazwie
+def get_xnode_id_by_name(name):
+   return [xid for xid in hg.get_all_xnodes_id() if hg.get_xnode_by_id(xid).get_property_value('name') == name][0]
+
+# proba wczytania pliku hipergrafu
+try:
+   win.load_hypergraph_from_file(path=sciezka_modelu)
+   hgprint("zaladowano plik hipergrafu!")
+
+# jesli plik o nazwie danej zmienna *sciezka_modelu* 
+# nie istnieje, tworzony jest nowy model
+# i zapisywany jest do pliku o tej nazwie
+except:
+   hgprint("Nie znaleziono pliku hipergrafu.\nTworzenie nowego modelu.")
+
+   hg_struct = dict()
+
+   from Vert import HBNode
+
+   # zmienne enum uzyskane z klasy HBNode oznaczajace typ hipergalezi
+   HE = HBNode.HB_HYPEREDGE
+   HA = HBNode.HB_HYPERARC
+   HL = HBNode.HB_HYPERLOOP
+
+   # tworzenie struktury modelu z przykladu w postaci slownika
+   hg_struct['u1'] = {'typ': HA, 'elementy': ('x3','x7','x1')}
+   hg_struct['u2'] = {'typ': HE, 'elementy': ('x2','x6','x8')}
+   hg_struct['u3'] = {'typ': HA, 'elementy': ('x5','x6','x4')}
+   hg_struct['u4'] = {'typ': HL, 'elementy': ('x4','x4')}
+   hg_struct['u5'] = {'typ': HL, 'elementy': ('x7','x7')}
+
+   for i, hbname in enumerate(sorted(hg_struct.keys())):
+      hgprint("\nhipergalaz {}".format(hbname))
+
+      hbtype = hg_struct[hbname]['typ']
+
+      nid_for_hb = list()
+
+      for nname in hg_struct[hbname]['elementy']:
+         hgprint("\twierzcholek {}".format(nname))
+
+         if nname not in [hg.get_node_by_id(nid).get_property_value('name') for nid in hg.get_all_nodes_id()]:
+            nodes_num = len(win.active_hg.get_all_nodes_id())
+
+            # tworzenie nowego wierzcholka w danym miejscu planszy rysowania
+            hg.add_node(nname, np.array((0.0,nodes_num*64.0)), {})
+
+            # zapisywanie stanu ewolucji hipergrafu
+            hg.save_evolutionary_state(True)
+            hg = win.active_hg
+      
+         nid_to_add = get_xnode_id_by_name(nname)
+         nid_for_hb.append(nid_to_add)
+
+      hgprint("\n\tid wierzcholkow do dodania {}".format(nid_for_hb))
+
+      if hbname not in [hg.get_hbnode_by_id(nid).get_property_value('name') for nid in hg.get_all_hyperbranches_id()]:
+         # dodawanie nowej hipergalezi
+         hbid = hg.add_hyperbranch(hbname, hbtype, nid_for_hb, {})
+            
+         hbnode = win.active_hg.get_hbnode_by_id(hbid)
+
+         hbnode.set_position(np.array((-250.0,110.0*i)))
+
+         # zapisywanie stanu ewolucji hipergrafu
+         hg.save_evolutionary_state(True)
+         hg = win.active_hg
+
+   # zapisywanie modelu hipergrafu do pliku
+   win.save_hypergraph_to_file(path=sciezka_modelu)
+
+hg=win.active_hg
+
+# wyswietlanie aktualnego stanu hipergrafu
+hgprint("\n\nAktualny hipergraf: \n{}".format(hg))
+
+# otrzymywanie macierzy incydencji hipergrafu
+A_dict = hg.macierz_incydencji_u21()
+A_dict['lines'] = [hg.get_xnode_by_id(xid).get_property_value('name') for xid in A_dict['lines'] ]
+A_dict['columns'] = [hg.get_xnode_by_id(xid).get_property_value('name') for xid in A_dict['columns'] ]
+
+# wyswietlanie macierzy incydecji hipergrafu
+hgprint("Macierz incydencji A: \n{}".format(
+Utils.matrix_result_dict_as_string(A_dict)))
+
+# uzyskiwnie id wierzcholkow z ich nazw
+x8_id = get_xnode_id_by_name('x8')
+x4_id = get_xnode_id_by_name('x4')
+
+# obliczanie najkrotszej sciezki z alg. Dijkstry
+p, d = Ma.return_dijkstra_path_from_a_to_b(hg, x8_id, x4_id)
+
+# wyswietlanie sciezki z alg. Dijkstry
+hgprint("Droga wg alg. Dijkstry z {} do {}:".format(
+hg.get_xnode_by_id(x8_id), 
+hg.get_xnode_by_id(x4_id)))
+hgprint(",\n".join(["    {}->({})->{}".format( hg.get_xnode_by_id(ii['a']), 
+hg.get_xnode_by_id(ii['h']), hg.get_xnode_by_id(ii['b']) ) for ii in p]))
+
+# zapisywanie stanu hipergrafu, aby mozna bylo cofnac akcje
+win.before_modify_action_handler()
+hg.add_node("test1", np.array((0.0,0.0)), {})
+
+hgprint('Stan po akcji wykonanej omylkowo:')
+hgprint(hg)
+
+# cofniecie akcji
+win.undo_action()
+
+hgprint('Stan po cofnieciu akcji:')
+hg=win.active_hg # uzyskiwanie aktualnego obiektu po cofnieciu
+# (zmienil sie adres tego obiektu)
+hgprint(hg)

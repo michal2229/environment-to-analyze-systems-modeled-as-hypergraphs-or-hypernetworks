@@ -1,0 +1,43 @@
+hgprint('Hello World')
+hgprint(hg)
+
+n_id_list = hg.get_all_nodes_id()
+nodes_list = [hg.get_node_by_id(nid) for nid in n_id_list]
+
+hb_id_list = hg.get_all_hyperbranches_id()
+hbnodes_list = [hg.get_hbnode_by_id(hid) for hid in hb_id_list]
+
+hgprint("Id wierz chołków:")
+hgprint(n_id_list)
+
+hgprint("Id hipergałęzi:")
+hgprint(hb_id_list)
+
+paramname = 'value'
+
+import random
+
+for i, n in enumerate(nodes_list):
+	value = random.uniform(1.0, 100.0)
+	n.set_property_value('value',  value)
+	n.set_property_value('bg_color', (value/100, value/100, value/100) )
+	n.set_radius(value)
+	n.set_mass(value*100 + 100)
+
+	#pos = np.array((1.0, 1.0))
+	#pos *= (random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0))
+	#pos *= 2000
+	#n.set_position(pos)
+
+	pos = np.array((1.0, 1.0))
+	pos *= (0,i)
+	pos *= 150
+	n.set_position(pos)
+
+for i, n in enumerate(hbnodes_list):
+	nodes_for_hb_id = hg.get_all_nodes_id_by_hyperbranch_id(n.get_id())
+
+	com = hg.get_xnodes_center_of_mass_by_xnodes_id_list(nodes_for_hb_id)
+
+	n.set_position(com+(1000,0))
+

@@ -1,0 +1,19 @@
+hgprint('Hello World')
+hgprint(hg)
+
+# hgprint('\n'.join(dir(utils)))
+
+a = np.array((3.0, 4.4))
+
+hgprint(a)
+
+# hgprint('\n'.join(dir(hg)))
+
+for i in range(100):
+    r = (i*20 + 250)
+    z = np.exp(-2j*np.pi*i*0.98/25)
+    rot = (z.real, z.imag)
+    pos = np.array((1.0,1.0))*r
+    nid = hg.add_node(name='', position=((pos*rot)), prop_dict={})
+
+# tworzenie 100 nowych wierzcholkow

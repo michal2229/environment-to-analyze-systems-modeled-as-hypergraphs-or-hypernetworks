@@ -1,0 +1,54 @@
+hgprint('Hello World')
+hgprint(hg)
+
+n_id_list = hg.get_all_nodes_id()
+nodes_list = [hg.get_node_by_id(nid) for nid in n_id_list]
+
+hb_id_list = hg.get_all_hyperbranches_id()
+hbnodes_list = sorted([hg.get_hbnode_by_id(hid) for hid in hb_id_list], key=lambda x: len(hg.get_all_nodes_id_by_hyperbranch_id(x.get_id())), reverse=True)
+
+hgprint("Id wierzchołków:")
+hgprint(n_id_list)
+
+hgprint("Id hipergałęzi:")
+hgprint(hb_id_list)
+
+#for i, n in enumerate(nodes_list):
+#	pos = np.array((1.0, 1.0))
+#	pos *= (16,i)
+#	pos *= 80
+#	n.set_position(pos)
+
+nodes_to_arrange = list(n_id_list)
+nodes_num = len(n_id_list)
+
+for i, n in enumerate(hbnodes_list):
+
+	hgprint("\nhgnode {}".format(n))
+
+	nodes_for_hb_id = hg.get_all_nodes_id_by_hyperbranch_id(n.get_id())
+
+	nodes_list = [hg.get_node_by_id(nid) for nid in nodes_for_hb_id]
+
+	for j, m in enumerate(nodes_list):
+		if m.get_id() in nodes_to_arrange:
+			hgprint("\tnode {}".format(m))
+
+			pos = np.array((1.0, 1.0))
+			
+			k = nodes_num - len(nodes_to_arrange)
+
+			pos *= (0,k)
+			pos *= 60
+			m.set_position(pos)
+
+			nodes_to_arrange.remove(m.get_id())
+
+
+	com = hg.get_xnodes_center_of_mass_by_xnodes_id_list(nodes_for_hb_id)
+	n.set_position(com+(-max(len(n_id_list), len(hb_id_list))*32,0))
+
+
+
+
+

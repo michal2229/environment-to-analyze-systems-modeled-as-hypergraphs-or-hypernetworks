@@ -1,0 +1,50 @@
+hgprint('Hello World')
+hgprint(hg)
+
+hgprint(win.custom_drawables)
+
+win.custom_drawables = list()
+
+win.custom_clickables = list()
+
+class CosDoNarysowania:
+	def __init__(self, x=25, y=25):
+		self.pos = (x,y)
+		self.i = 0
+		self.text = "test"
+
+	def draw(self, cro, pan_vec, center, zoom):
+		text = '{} {}'.format(self.text, self.i)
+		cro.set_source_rgb(*(0,0,0))
+		cro.select_font_face("Terminal", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+		font_size = 24
+		cro.set_font_size(font_size)
+		e_xbearing, e_ybearing, e_width, e_height, e_xadvance, e_yadvance = cro.text_extents(text)
+		
+		cro.move_to(*self.pos)
+		cro.show_text(text)
+
+		self.i += 1
+
+	def mouse_button_clicked(self, widget, event):
+		x = event.x
+		y = event.y
+		state = event.state
+
+		self.text = '(kliknieto {0:.1f}, {1:.1f})'.format(x,y)
+		
+
+cdn = CosDoNarysowania(30,30)
+
+win.custom_drawables.append(cdn)
+win.custom_clickables.append(cdn)
+
+cdn2 = CosDoNarysowania(30,60)
+
+win.custom_drawables.append(cdn2)
+#win.custom_clickables.append(cdn2) 
+# zakomentowane, wiec drugi obiekt nie reaguje na klikniecia
+
+
+
+

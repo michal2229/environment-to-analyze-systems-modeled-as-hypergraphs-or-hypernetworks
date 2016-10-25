@@ -1,0 +1,144 @@
+import pyopencl as cl
+import time as t
+
+hgprint('Skrypt sumujący wiersze macierzy kwadratowej.')
+hgprint('Tworzony jest program OpenCL w języku C99. Następnie jest kompilowany i uruchamiany.')
+hgprint('Przyjmuje macierz kwadratową A - sumowaną, i wektor B - wynikowy.')
+
+n = 16*1000  # wymiar macierzy (podzielny przez 16)
+
+if not OCL.is_initialized():
+	OCL.init_kernel()
+
+if 'funkcja' not in OCL.prog.keys() or OCL.prog['funkcja'] is None :
+
+	kod_programu = """
+	__kernel void 
+		suma_wierszy_m_kw( 
+			__global const float *A, 
+			__global float *B 
+	) {
+		int x = get_global_id(0); // indeks procesora strumieniowego = indeks sumowanego wiersza macierzy A
+		int maxbx = get_global_size(0); // wielkosc macierzy kw. A / dlugosc wektora B
+		int maxby = maxbx;
+
+		int lx = get_local_id(0);
+		int maxlx = get_local_size(0);
+
+		//printf("l:%i/%i - g:%i/%i\\n", lx, maxlx, x, maxbx); 
+
+		//float a[2] = {1.0f, 2.0f};
+		//float16 b = (float16)(a[0]);
+
+		//printf("%f,%f\\n", b.s0, b.s1);
+
+		float s = 0.0f; // zmienna sumy
+
+		//for (int y = 0; y<maxby; y++) {
+		//	s += A[maxby*x + y]; // dodawanie do elementu wektora
+		//} // 0.48s dla n = 16*1000
+
+		for (int y = 0; y<maxby/16; y++) { // sumowanie jednego wiersza
+			float16 b = (float16)(
+				A[maxby*x + y*16 + 0], A[maxby*x + y*16 + 1], A[maxby*x + y*16 + 2], A[maxby*x + y*16 + 3], 
+				A[maxby*x + y*16 + 4], A[maxby*x + y*16 + 5], A[maxby*x + y*16 + 6], A[maxby*x + y*16 + 7],
+				A[maxby*x + y*16 + 8], A[maxby*x + y*16 + 9], A[maxby*x + y*16 +10], A[maxby*x + y*16 +11], 
+				A[maxby*x + y*16 +12], A[maxby*x + y*16 +13], A[maxby*x + y*16 +14], A[maxby*x + y*16 +15] );  // coalescence using vector
+			s += b.s0 + b.s1+b.s2+b.s3+b.s4+b.s5+b.s6+b.s7+b.s8+b.s9+b.sa+b.sb+ b.sc+b.sd+b.se+b.sf;
+		} // 0.084s dla n = 16*1000
+
+		B[x] = s; // przypisywanie - mniejsza potrzebna przepustowosc pamieci niz przy inkrementacji komorki pamieci globalnej
+	}
+	"""
+	try:
+		tk_s = t.time()
+		prg = cl.Program(
+			OCL.prog['ctx'], 
+			kod_programu
+		).build()
+		tk_k = t.time()
+
+		OCL.prog['funkcja'] = prg.suma_wierszy_m_kw
+	
+		hgprint("\nczas kompil. kodu: \t{0:.6f}s".format(tk_k - tk_s))
+	except:
+		OCL.prog['funkcja'] = None
+else:
+	pass
+
+
+
+tnp_s = t.time()
+Anp = np.arange(n**2, dtype=np.float32).reshape((n,n))
+Bnp = np.zeros((Anp.shape[0]), dtype=np.float32)
+tnp_k = t.time()
+
+tbuf_s = t.time()
+buf_in = cl.Buffer(
+	OCL.prog['ctx'],
+	OCL.prog['mf'].READ_ONLY | OCL.prog['mf'].COPY_HOST_PTR,
+	size=Anp.nbytes,
+	hostbuf=Anp
+)
+buf_out = cl.Buffer(
+	OCL.prog['ctx'],
+	OCL.prog['mf'].WRITE_ONLY | OCL.prog['mf'].ALLOC_HOST_PTR,
+	size=Bnp.nbytes
+)
+tbuf_k = t.time()
+
+tw_s = t.time()
+OCL.prog['funkcja'](
+	OCL.prog['queue'], 
+	(Bnp.shape[0],),
+	None, 
+	buf_in, 
+	buf_out
+).wait()  # queue, globalSize, localSize, *buffers)
+tw_k = t.time()
+
+ten_s = t.time()
+cl.enqueue_read_buffer(
+	OCL.prog['queue'],
+	buf_out,
+	Bnp
+)
+ten_k = t.time()
+
+tf_s = t.time()
+OCL.prog['queue'].finish()
+tf_k = t.time()
+
+tfb_s = t.time()
+Cnp = Anp.sum(axis=1) # 0.109416s
+tfb_k = t.time()
+
+hgprint("tworzenie mac. NP: \t{0:.6f}s".format(tnp_k - tnp_s))
+hgprint("czas przyg. buf.: \t{0:.6f}s".format(tbuf_k - tbuf_s))
+hgprint("czas wykon. CL:  \t{0:.6f}s".format(tw_k - tw_s))
+hgprint("czas wykon. NP.: \t{0:.6f}s".format(tfb_k - tfb_s))
+hgprint("czas pobr. pam.: \t{0:.6f}s".format(ten_k - ten_s))
+hgprint("czas kon. kolejki: \t{0:.6f}s".format(tf_k - tf_s))
+hgprint("calosc OCL:           \t{0:.6f}s".format(ten_k - tnp_s))
+hgprint("calosc NP:             \t{0:.6f}s".format((tfb_k - tfb_s)+(tnp_k - tnp_s)))
+
+hgprint("\nMacierz sumowana:")
+hgprint(Anp)
+
+hgprint("\nWektor wynikowy OCL:")
+hgprint(Bnp)
+
+hgprint("\nWektor wynikowy NP:")
+hgprint(Cnp)
+
+hgprint("\nBledy:")
+hgprint(Cnp - Bnp)
+
+hgprint("\nBledy wzgledne:")
+hgprint((Cnp - Bnp)/Cnp)
+
+# czyszczenie pamieci
+Anp, Bnp,buf_in,buf_out,OCL.prog['funkcja'] = None, None, None, None, None
+
+
+

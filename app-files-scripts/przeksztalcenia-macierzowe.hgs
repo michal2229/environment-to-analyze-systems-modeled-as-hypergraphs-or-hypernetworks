@@ -1,0 +1,102 @@
+hgprint(hg)
+
+from Vert import HBNode
+
+Ab = hg.bin_macierz_incydencji()
+B = hg.macierz_przyleglosci_galezi()
+R = hg.macierz_przyleglosci_wierzcholkow()
+
+r = dict()
+
+nodes_id_list = Ab['lines']
+hyperbranch_id_list = Ab['columns']
+
+hgprint("\nwierzcholki")
+hgprint(nodes_id_list)
+hgprint("\nhipergalezie")
+hgprint(hyperbranch_id_list)
+
+Abmat = Ab['matrix']
+Bmat = B['matrix']
+Rmat = R['matrix']
+
+a = Abmat
+b = Bmat
+r = Rmat
+
+hgprint("\nA")
+hgprint(a)
+
+at = Abmat.transpose()
+hgprint("\nA^T")
+hgprint(at)
+
+atxa = np.dot(at, a)
+
+hgprint("\nA^T * A")
+hgprint(atxa)
+
+hgprint("\nB")
+hgprint(b)
+
+hgprint("\nA^T * A == B")
+hgprint(np.equal(atxa, b))
+hgprint(np.equal(atxa, b).all())
+
+
+axat = np.dot(a, at)
+hgprint("\nA * A^T")
+hgprint(axat)
+
+hgprint("\nR")
+hgprint(r)
+
+hgprint("\nA * A^T == R")
+hgprint(np.equal(axat, r))
+hgprint(np.equal(axat, r).all())
+
+hgprint("\nA * A^T - R")
+hgprint(axat-r)
+
+
+
+#wekt_r = (axat-r).sum(axis=0)
+#hgprint("\nwektor przekatnej roznicy (A * A^T) - R")
+#hgprint(wekt_r)
+
+
+hgprint("\nwektor przekatnej A * A^T")
+wekt_przek = np.multiply(np.eye(r.shape[0], dtype=np.int), axat).sum(axis=1)
+hgprint(wekt_przek)
+
+#a_w_sum = a.sum(axis=1)
+#hgprint("\nmacierz Ab po zsumowaniu wierszy")
+#hgprint(a_w_sum)
+
+
+I = np.eye(a.shape[0], dtype=np.int)
+nI = 1 - I
+
+#hgprint("\n (A * A^T) - wektor_zsum_ab*I")
+#axatminsumrazyi = np.dot(a, at) - I*a_w_sum
+#hgprint(axatminsumrazyi)
+
+#hgprint("\nA * A^T - I*Ab_sv == R")
+#hgprint(np.equal(axatminsumrazyi, r))
+#hgprint(np.equal(axatminsumrazyi, r).all())
+
+Nhloop = np.array([len(hg.get_all_hyperbranches_id_by_node_id(nid, hbtype=HBNode.HB_HYPERLOOP)) for nid in nodes_id_list], dtype=np.int)
+hgprint("\nNhloop")
+hgprint(Nhloop)
+
+dminusnhl = wekt_przek - Nhloop
+hgprint("\ndminusnhl")
+hgprint(dminusnhl)
+
+hgprint("\n (A * A^T) - dminusnhl*I")
+axatminsdiagminusnhl = np.dot(a, at) - I*dminusnhl
+hgprint(axatminsdiagminusnhl)
+
+hgprint("\n(A * A^T) - dminusnhl*I == R")
+hgprint(np.equal(axatminsdiagminusnhl, r))
+hgprint(np.equal(axatminsdiagminusnhl, r).all())
