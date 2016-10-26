@@ -91,5 +91,3 @@ W pewnym stopniu zoptymalizowano:
 ![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen11.png)
 
 ![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen12.png)
-
-![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen13.png)
