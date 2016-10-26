@@ -1,5 +1,7 @@
 ## README 
 
+![screen](https://raw.githubusercontent.com/michal2229/environment-to-analyze-systems-modeled-as-hypergraphs-or-hypernetworks/master/results/screen13.png)
+
 ### Teoria 
 
 Projekt powstał głównie w oparciu o informacje z książki: B. Korzan, "Grafy, hipergrafy i sieci".
